@@ -9,5 +9,118 @@
     <h1>neXup Documentation Page</h1>
     <p class="intro">The neXup app will initially be a web application that provides users with information about various movies, directors, actors, genres, and more. Users will be able to sign up, update their personal information, and create a list of their favorite movies from the site's selection.</p>
     <p class="intro">The dream for the future of neXup is for it to become an invaluable resource for users to catalog, rate, and rank every movie and show they've watched and be able to use the app to find recommendations on what to watch next.</p>
+    <div class="endpoints_container" style="display: flex; flex-direction: column; align-items: center;">
+        <h1>URL endpoints</h1>
+        <style>
+            table#endpoints-table tr:nth-child(even) { background-color: lightgray;}
+            th { border-bottom: 1px solid black; }
+            table#endpoints-table { max-width: 75%; text-align: center;}
+        </style>
+        <table id="endpoints-table" style="border: 1px solid black;">
+            <tr>
+                <th>Business Logic</th>
+                <th>URL</th>
+                <th>HTTP Method</th>
+                <th>Request body format</th>
+                <th>Response body format</th>
+            </tr>
+            <tr>
+                <td style="border-right: 2px solid black;">Get list of all movies</td>
+                <td style="border-right: 2px solid black;">/movies</td>
+                <td style="border-right: 2px solid black;">GET</td>
+                <td style="border-right: 2px solid black;">None</td>
+                <td>A JSON object holding data about all the movies, including their title, description, director, genre, and an image URL.</td>
+            </tr>
+            <tr>
+                <td style="border-right: 2px solid black;">Get data on single movie (by name?)</td>
+                <td style="border-right: 2px solid black;">/movies/:title</td>
+                <td style="border-right: 2px solid black;">GET</td>
+                <td style="border-right: 2px solid black;">None</td>
+                <td>A JSON object holding data about a single movie, contains description, genre, director, image URL,
+                    featured or not.
+                </td>
+            </tr>
+            <tr>
+                <td style="border-right: 2px solid black;">Get data on genre by name</td>
+                <td style="border-right: 2px solid black;">/movies/genre/:genreName</td>
+                <td style="border-right: 2px solid black;">GET</td>
+                <td style="border-right: 2px solid black;">None</td>
+                <td>A JSON object containing a brief description of each genre: {
+                    "name": "Action",
+                    "description": "Should contain numerous scenes where action is spectacular and usually destructive. Often includes non-stop motion, high energy physical stunts, chases, battles, and destructive crises (floods, explosions, natural disasters, fires, etc.)." }
+                </td>
+            </tr>
+            <tr>
+                <td style="border-right: 2px solid black;">Get data on director by name</td>
+                <td style="border-right: 2px solid black;">/movies/directors/:directorName</td>
+                <td style="border-right: 2px solid black;">GET</td>
+                <td style="border-right: 2px solid black;">None</td>
+                <td>A JSON object with data on the director, contains bio, birth year, death year (if applicable),
+                    and a list of their best movies. Example: {
+                        "name": "Hayao Miyazaki",
+                        "bio": "Hayao Miyazaki is a Japanese animator, filmmaker, and manga artist.",
+                        "born": "1941"
+                    }
+                </td>
+            </tr>
+            <tr>
+                <td style="border-right: 2px solid black;">Create account for a new user</td>
+                <td style="border-right: 2px solid black;">/users</td>
+                <td style="border-right: 2px solid black;">POST</td>
+                <td style="border-right: 2px solid black;">A JSON object holding data about the user that's to be 
+                    added/registered, structured like: {
+                        "name": "JimBob",
+                        "favoriteMovies": ["Snatch", "Gladiator"] }
+                </td>
+                <td>A JSON object holding data about the student that was registered: {
+                    "name": "JimBob",
+                    "favoriteMovies": ["Snatch", "Gladiator"],
+                    "id": "8e65a264-5ba7-4885-8ecb-f6948a7030b3" }
+            </td>
+            </tr>
+            <tr>
+                <td style="border-right: 2px solid black;">Update user's account info</td>
+                <td style="border-right: 2px solid black;">/users/:id</td>
+                <td style="border-right: 2px solid black;">PUT</td>
+                <td style="border-right: 2px solid black;">A JSON object containing the user's new name, structured
+                    like: { "name": "Kayla" }
+                </td>
+                <td>A JSON object containing the user's account info: { "id": 1,
+                    "name": "Kayla",
+                    "favoriteMovies": [
+                        "Die Hard",
+                        "Eternal Sunshine of the Spotless Mind"] }</td>
+            </tr>
+            <tr>
+                <td style="border-right: 2px solid black;">Update user's favorite movie list</td>
+                <td style="border-right: 2px solid black;">/users/:id/:movieTitle</td>
+                <td style="border-right: 2px solid black;">POST</td>
+                <td style="border-right: 2px solid black;">None</td>
+                <td>A text message confirming whether the new favorite movie was added.</td>
+            </tr>
+                <td style="border-right: 2px solid black;">Get user's favorites list</td>
+                <td style="border-right: 2px solid black;">/users/:id/favorites</td>
+                <td style="border-right: 2px solid black;">GET</td>
+                <td style="border-right: 2px solid black;">None</td>
+                <td>A JSON object containing all of the user's favorite movies: [
+                    "Iron Man",
+                    "The Dark Knight" ]
+                </td>
+            <tr>
+                <td style="border-right: 2px solid black;">Delete movie from user's favorite list</td>
+                <td style="border-right: 2px solid black;">/users/:id/:movieTitle</td>
+                <td style="border-right: 2px solid black;">DELETE</td>
+                <td style="border-right: 2px solid black;">None</td>
+                <td>A text message confirming whether the former favorite movie was removed.</td>
+            </tr>
+            <tr>
+                <td style="border-right: 2px solid black;">Delete user account (deregister)</td>
+                <td style="border-right: 2px solid black;">/users/:id</td>
+                <td style="border-right: 2px solid black;">DELETE</td>
+                <td style="border-right: 2px solid black;">None</td>
+                <td>A text message confirming whether the user's account was deleted.</td>
+            </tr>
+        </table>
+    </div>
 </body>
 </html>
