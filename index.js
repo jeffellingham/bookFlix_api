@@ -178,21 +178,19 @@ let movies = [
     }
 ]
 
-// READ / GET Homepage --> is this needed??
+// CRUD:
+
+// READ: GET Homepage --> is this needed??
 app.get('/', (req, res) => {
     res.send('Hello movie lover! Pop some corn, pop a squat, and pop on a flick.');
 });
 
-// READ / GET all movies
+// READ: GET all movies
 app.get('/movies', (req, res) => {
     res.status(200).json(movies);
 });
 
-app.get('/users', (req, res) => {
-    res.status(200).json(users);
-});
-
-// READ / GET a single movie by title
+// READ: GET a single movie by title
 app.get('/movies/:title', (req, res) => {
     // const title = req.params.title;
     // ^Equivalent to object destructuring below, where variable name is also the far-right part of property.
@@ -206,7 +204,19 @@ app.get('/movies/:title', (req, res) => {
     }
 });
 
-// READ / GET data on genre by name
+// READ: GET all movies with a specific actor
+app.get('/movies/:actor', (req, res) => {
+    const { actor } = req.params;
+    const movie = movies.find( movie => movie.actors === actor);
+
+    if (actor) {
+        res.status(200).json(movie);
+    } else {
+        res.status(400).send('No movies with that actor.')
+    }
+});
+
+// READ: GET data on genre by name
 app.get('/movies/genre/:genreName', (req, res) => {
     const { genreName } = req.params;
     const genre = movies.find( movie => movie.genre.name === genreName ).genre;
@@ -218,7 +228,7 @@ app.get('/movies/genre/:genreName', (req, res) => {
     }
 });
 
-// READ / GET data on director by name
+// READ: GET data on director by name
 app.get('/movies/directors/:directorName', (req, res) => {
     const { directorName } = req.params;
     const director = movies.find( movie => movie.director.name === directorName).director;
@@ -230,7 +240,7 @@ app.get('/movies/directors/:directorName', (req, res) => {
     }
 });
 
-// POST / CREATE account for a new user
+// CREATE: account for a new user
 app.post('/users', (req, res) => {
     const newUser = req.body;
 
@@ -243,7 +253,7 @@ app.post('/users', (req, res) => {
     }
 });
 
-// UPDATE user's account info (only username?)
+// UPDATE: user's account info (only username?)
 app.put('/users/:id', (req, res) => {
     const { id } = req.params;
     const updatedUser = req.body;
@@ -258,7 +268,7 @@ app.put('/users/:id', (req, res) => {
     }
 });
 
-// CREATE new movie on user's favorites list --> This could also be a PUT/UPDATE method
+// CREATE: new movie on user's favorites list --> This could also be a PUT/UPDATE method
 app.post('/users/:id/:movieTitle', (req, res) => {
     const { id, movieTitle } = req.params;
 
@@ -272,7 +282,7 @@ app.post('/users/:id/:movieTitle', (req, res) => {
     }
 });
 
-// GET a user's favorites list
+// READ: a user's favorites list
 app.get('/users/:id/favorites', (req, res) => {
     const { id } = req.params;
 
@@ -285,7 +295,7 @@ app.get('/users/:id/favorites', (req, res) => {
     }
 })
 
-// DELETE movie from user's favorites list
+// DELETE: movie from user's favorites list
 app.delete('/users/:id/:movieTitle', (req, res) => {
     const { id, movieTitle } = req.params;
 
@@ -299,7 +309,7 @@ app.delete('/users/:id/:movieTitle', (req, res) => {
     }
 });
 
-// DELETE user's account
+// DELETE: user's account
 app.delete('/users/:id', (req, res) => {
     const { id } = req.params;
 

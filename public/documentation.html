@@ -29,15 +29,22 @@
                 <td style="border-right: 2px solid black;">/movies</td>
                 <td style="border-right: 2px solid black;">GET</td>
                 <td style="border-right: 2px solid black;">None</td>
-                <td>A JSON object holding data about all the movies, including their title, description, director, genre, and an image URL.</td>
+                <td>A JSON object holding data about all the movies, including their title, description, director, genre, an image URL, featured or not, release year, and actors.</td>
             </tr>
             <tr>
-                <td style="border-right: 2px solid black;">Get data on single movie (by name?)</td>
+                <td style="border-right: 2px solid black;">Get data on single movie</td>
                 <td style="border-right: 2px solid black;">/movies/:title</td>
                 <td style="border-right: 2px solid black;">GET</td>
                 <td style="border-right: 2px solid black;">None</td>
-                <td>A JSON object holding data about a single movie, contains description, genre, director, image URL,
-                    featured or not.
+                <td>A JSON object holding data about a single movie, contains description, genre, director, image URL, featured or not, release year, and actors.
+                </td>
+            </tr>
+            <tr>
+                <td style="border-right: 2px solid black;">Get all movies with an actor</td>
+                <td style="border-right: 2px solid black;">/movies/:actor</td>
+                <td style="border-right: 2px solid black;">GET</td>
+                <td style="border-right: 2px solid black;">None</td>
+                <td>A JSON object holding data about a one or more movies, containing description, genre, director, image URL, featured or not, release year, and actors.
                 </td>
             </tr>
             <tr>
