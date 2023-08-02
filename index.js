@@ -5,7 +5,9 @@ const express = require('express'),
     uuid = require('uuid'),
     morgan = require('morgan'),
     mongoose = require('mongoose'),
-    Models = require('./models.js');
+    Models = require('./models.js'),
+    cors = require('cors'),
+    { check, validationResult } = require('express-validator');
 
 const Movies = Models.Movie;
 const Users = Models.User;
@@ -20,6 +22,20 @@ app.use(express.static('public'));
 app.use(morgan('common'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+//app.use(cors());
+let allowedOrigins = ['http://localhost:8080', 'http://testsite.com'];
+
+app.use(cors({
+    origin: (origin, callback) => {
+        if(!origin) return callback(null, true);
+        if(allowedOrigins.indexOf(origin) === -1){ //If origin isn't found on allowed list
+            let message = 'The CORS policy for this app doesn\'t allow access from origin ' + origin;
+            return callback(new Error(message), false);
+        } 
+        return callback(null, true);
+    }
+}));
 
 let auth = require('./auth.js')(app);
 
@@ -129,7 +145,19 @@ app.get('/directors/:directorName', passport.authenticate('jwt', { session: fals
 // });
 
 // CREATE: account for a new user
-app.post('/users', async (req, res) => {
+app.post('/users', [
+    check('username', 'Username is required').isLength({min: 5}),
+    check('username', 'Username contains non alphanumeric characters - not allowed.').isAlphanumeric(),
+    check('password', 'Password is required').not().isEmpty(),
+    check('email', 'Email does not appear to be valid').isEmail()
+], async (req, res) => {
+    //Check validation object for errors
+    let errors = validationResult(req);
+    if(!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+
+    let hashedPassword = Users.hashPassword(req.body.password);
     await Users.findOne({ username: req.body.username })
         .then((user) => {
             if(user) {
@@ -137,7 +165,7 @@ app.post('/users', async (req, res) => {
             }else {
                 Users.create({
                     username: req.body.username,
-                    password: req.body.password,
+                    password: hashedPassword,
                     email: req.body.email,
                     birthday: req.body.birthday
                 })
@@ -157,14 +185,27 @@ app.post('/users', async (req, res) => {
 });
 
 // UPDATE: user's account info (only username?)
-app.put('/users/:username', passport.authenticate('jwt', { session: false }), async (req, res) => {
+app.put('/users/:username', [
+    check('username', 'Username is required').isLength({min: 5}),
+    check('username', 'Username contains non alphanumeric characters - not allowed.').isAlphanumeric(),
+    check('password', 'Password is required').not().isEmpty(),
+    check('email', 'Email does not appear to be valid').isEmail()
+], passport.authenticate('jwt', { session: false }), async (req, res) => {
+    //Check validation object for errors
+    let errors = validationResult(req);
+    if(!errors.isEmpty()) {
+        return res.status(422).json({ errors: errors.array() });
+    }
+
+    let hashedPassword = Users.hashPassword(req.body.password);
+
     if(req.user.username !== req.params.username){
         return res.status(400).send('Permission denied, you sneaky devil.');
     }
     await Users.findOneAndUpdate({ username: req.params.username }, { $set:
         {
             username: req.body.username,
-            password: req.body.password,
+            password: hashedPassword,
             email: req.body.email,
             birthday: req.body.birthday
         }
@@ -209,15 +250,21 @@ app.get('/users/:username/favorites', passport.authenticate('jwt', { session: fa
             if (!user) {
                 res.status(400).send(req.params.username + ' was not found.');
             } else {
-                // Users.aggregate( [ {
-                //     $lookup:
-                //         {
+                //This is Jubril's tweaked version of $lookup that should work, downside is it'll create a new array field in the document. I'm also not sure yet if I even want this.
+                // Users.aggregate([
+                //     {
+                //         $match: { username: 'desired_username' } // Replace 'desired_username' with the actual username you want to query.
+                //     },
+                //     {
+                //         $lookup: {
                 //             from: "Movies",
-                //             localField: "user.favoriteMovies",
+                //             localField: "favoriteMovies",
                 //             foreignField: "_id",
-                //             as: "movieList"
+                //             as: "favoriteMoviesData"
                 //         }
-                // }])
+                //     }
+                //     ])
+
                 //let userFavorites = Movies.find({ _id: user.favoriteMovies })
                 res.status(200).json(user.favoriteMovies);
             }
@@ -267,6 +314,7 @@ app.use((err, req, res, next) => {
 });
 
 // Listen for request
-app.listen(8080, () => {
-    console.log('App is listening on port 8080.');
+const port = process.env.PORT || 8080;
+app.listen(port, '0.0.0.0', () => {
+    console.log('Listening on port ' + port);
 });
