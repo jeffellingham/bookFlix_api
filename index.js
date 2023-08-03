@@ -12,10 +12,16 @@ const express = require('express'),
 const Movies = Models.Movie;
 const Users = Models.User;
 
-mongoose.connect('mongodb://127.0.0.1/bookFlixDB', { 
+mongoose.connect( process.env.CONNECTION_URI, { 
     useNewUrlParser: true, 
     useUnifiedTopology: true 
 });
+
+//Local connection for testing purposes
+// mongoose.connect('mongodb://127.0.0.1/bookFlixDB', { 
+//     useNewUrlParser: true, 
+//     useUnifiedTopology: true 
+// });
 
 // Middleware
 app.use(express.static('public'));
