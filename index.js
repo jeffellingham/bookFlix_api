@@ -1,7 +1,7 @@
 const express = require("express"),
   app = express(),
-  bodyParser = require("body-parser"),
-  uuid = require("uuid"),
+  // bodyParser = require('body-parser'),
+  // uuid = require('uuid'),
   morgan = require("morgan"),
   mongoose = require("mongoose"),
   Models = require("./models.js"),
@@ -36,7 +36,7 @@ app.use(cors());
 //         if(!origin) return callback(null, true);
 //         if(allowedOrigins.indexOf(origin) === -1){ //If origin isn't found on allowed list
 //             let message = 'The CORS policy for this app doesn\'t allow access from origin ' + origin;
-//             return callback(new Error(message), false);cd
+//             return callback(new Error(message), false);
 //         }
 //         return callback(null, true);
 //     }
@@ -55,7 +55,7 @@ app.get("/", (req, res) => {
 });
 
 // READ: GET all movies
-app.get("/movies", async (req, res) => {
+app.get("/movies", passport.authenticate("jwt", { session: false }), async (req, res) => {
   await Movies.find()
     .then((movies) => {
       res.status(200).json(movies);
