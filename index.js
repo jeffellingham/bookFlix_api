@@ -115,16 +115,20 @@ app.get("/genre/:genreName", passport.authenticate("jwt", { session: false }), a
 });
 
 // READ: GET all movies by specific director
-app.get("/movies/directors/:directorName", passport.authenticate("jwt", { session: false }), async (req, res) => {
-  await Movies.find({ "director.name": req.params.directorName })
-    .then((moviesdirected) => {
-      res.status(200).json(moviesdirected);
-    })
-    .catch((err) => {
-      console.error(err);
-      res.status(400).send("No movies by that director. Error: " + err);
-    });
-});
+app.get(
+  "/movies/directors/:directorName",
+  passport.authenticate("jwt", { session: false }),
+  async (req, res) => {
+    await Movies.find({ "director.name": req.params.directorName })
+      .then((moviesdirected) => {
+        res.status(200).json(moviesdirected);
+      })
+      .catch((err) => {
+        console.error(err);
+        res.status(400).send("No movies by that director. Error: " + err);
+      });
+  }
+);
 
 // READ: GET data on director by name
 app.get("/directors/:directorName", passport.authenticate("jwt", { session: false }), async (req, res) => {
@@ -241,6 +245,58 @@ app.put(
   }
 );
 
+// CREATE: add movie to user's watchList --> This could also be a PUT/UPDATE method
+app.post(
+  "/users/:username/watchlist/:movieID",
+  passport.authenticate("jwt", { session: false }),
+  async (req, res) => {
+    await Users.findOneAndUpdate(
+      { username: req.params.username },
+      {
+        $push: { watchList: req.params.movieID },
+      },
+      { new: true }
+    )
+      .then((updatedUser) => {
+        if (!updatedUser) {
+          res.status(400).send("No user by name of " + req.params.username);
+        } else {
+          res.status(201).json(updatedUser);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        res.status(400).send("Something went wrong. Error: " + err);
+      });
+  }
+);
+
+// DELETE: remove movie from user's watchList
+app.delete(
+  "/users/:username/watchlist/:movieID",
+  passport.authenticate("jwt", { session: false }),
+  async (req, res) => {
+    await Users.findOneAndUpdate(
+      { username: req.params.username },
+      {
+        $pull: { watchList: req.params.movieID },
+      },
+      { new: true }
+    )
+      .then((updatedUser) => {
+        if (!updatedUser) {
+          res.status(400).send("No user by name of " + req.params.username);
+        } else {
+          res.status(200).json(updatedUser);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        res.status(400).send("Something went wrong. Error: " + err);
+      });
+  }
+);
+
 // CREATE: new movie on user's favorites list --> This could also be a PUT/UPDATE method
 app.post("/users/:username/:movieID", passport.authenticate("jwt", { session: false }), async (req, res) => {
   await Users.findOneAndUpdate(
@@ -295,22 +351,26 @@ app.get("/users/:username/favorites", passport.authenticate("jwt", { session: fa
 });
 
 // DELETE: movie from user's favorites list
-app.delete("/users/:username/:movieID", passport.authenticate("jwt", { session: false }), async (req, res) => {
-  await Users.findOneAndUpdate(
-    { username: req.params.username },
-    {
-      $pull: { favoriteMovies: req.params.movieID },
-    },
-    { new: true }
-  )
-    .then((updatedUser) => {
-      res.status(201).json(updatedUser);
-    })
-    .catch((err) => {
-      console.error(err);
-      res.status(400).send("Something went wrong. Error: " + err);
-    });
-});
+app.delete(
+  "/users/:username/:movieID",
+  passport.authenticate("jwt", { session: false }),
+  async (req, res) => {
+    await Users.findOneAndUpdate(
+      { username: req.params.username },
+      {
+        $pull: { favoriteMovies: req.params.movieID },
+      },
+      { new: true }
+    )
+      .then((updatedUser) => {
+        res.status(201).json(updatedUser);
+      })
+      .catch((err) => {
+        console.error(err);
+        res.status(400).send("Something went wrong. Error: " + err);
+      });
+  }
+);
 
 // DELETE: user's account
 app.delete("/users/:username", passport.authenticate("jwt", { session: false }), async (req, res) => {
