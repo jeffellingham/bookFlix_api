@@ -28,19 +28,27 @@ app.use(morgan("common"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(cors());
-//using line above over code below because task stated to allow _all_ domains
-// let allowedOrigins = ['http://localhost:8080', 'http://testsite.com'];
-// app.use(cors({
-//     origin: (origin, callback) => {
-//         if(!origin) return callback(null, true);
-//         if(allowedOrigins.indexOf(origin) === -1){ //If origin isn't found on allowed list
-//             let message = 'The CORS policy for this app doesn\'t allow access from origin ' + origin;
-//             return callback(new Error(message), false);
-//         }
-//         return callback(null, true);
-//     }
-// }));
+// app.use(cors());
+//using line above instead of code below because task stated to allow _all_ domains
+let allowedOrigins = [
+  "http://localhost:8080",
+  "http://testsite.com",
+  "http://localhost:1234",
+  "https://bookflix.netlify.app",
+];
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.indexOf(origin) === -1) {
+        //If origin isn't found on allowed list
+        let message = "The CORS policy for this app doesn't allow access from origin " + origin;
+        return callback(new Error(message), false);
+      }
+      return callback(null, true);
+    },
+  })
+);
 
 let auth = require("./auth.js")(app);
 
