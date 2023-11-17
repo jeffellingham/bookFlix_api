@@ -34,7 +34,7 @@ let allowedOrigins = [
   "http://localhost:8080",
   "http://testsite.com",
   "http://localhost:1234",
-  "https://bookflix.netlify.app",
+  "https://bookflixapp.netlify.app",
 ];
 app.use(
   cors({
